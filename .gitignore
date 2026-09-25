@@ -11,3 +11,4 @@ src/frontend/landing.png
 .DS_Store
 
 gh-600-lab-starter.code-workspace
+src/frontend/package-lock.json
