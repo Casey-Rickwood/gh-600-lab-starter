@@ -9,3 +9,5 @@ test-results/
 src/frontend/results.json
 src/frontend/landing.png
 .DS_Store
+
+gh-600-lab-starter.code-workspace
