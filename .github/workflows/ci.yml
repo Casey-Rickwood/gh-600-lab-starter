@@ -253,10 +253,19 @@ jobs:
         run: dotnet publish src/api/TodoApi.csproj -c Release -o ./publish
 
       - name: Deploy API to App Service
-        uses: azure/webapps-deploy@v3
-        with:
-          app-name: ${{ steps.infra.outputs.apiAppName }}
-          package: ./publish
+        env:
+          API_APP_NAME: ${{ steps.infra.outputs.apiAppName }}
+          RESOURCE_GROUP: ${{ secrets.AZURE_RG }}
+        run: |
+          (cd publish && zip -qr ../api.zip .)
+          for attempt in 1 2 3 4 5; do
+            if az webapp deploy --resource-group "$RESOURCE_GROUP" --name "$API_APP_NAME" --src-path api.zip --type zip; then
+              exit 0
+            fi
+            echo "Deployment attempt $attempt failed (possibly throttled); retrying..."
+            sleep $((attempt * 30))
+          done
+          exit 1
 
       - uses: actions/setup-node@v7
         with:
